@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تطبيق قواعد اللغة الإنجليزية - الجزء 1</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #121212; color: #f5f5f5; padding: 15px; }
+  h1 { text-align: center; color: #d4af37; margin-bottom: 20px; }
+  .container { max-width: 900px; margin: auto; background: #1c1c1c; padding: 20px; border-radius: 15px; border: 2px solid #d4af37; box-shadow: 0 0 15px rgba(212,175,55,0.5); }
+  button { padding: 10px; margin: 10px 0; border-radius: 8px; border: 1px solid #d4af37; background: #2c2c2c; color: #f5f5f5; cursor: pointer; }
+  button:hover { background: #3c3c3c; }
+  .answer, #suggestionsList, #questionsList { margin-top: 15px; background: #2c2c2c; padding: 15px; border-radius: 10px; border: 1px solid #d4af37; display: none; }
+  input[type=text] { padding: 8px; border-radius: 5px; border: 1px solid #d4af37; width: 80%; background: #1c1c1c; color: #f5f5f5; }
+  .question-item { display: flex; justify-content: space-between; align-items: center; margin: 5px 0; }
+  .question-item button { padding: 5px 10px; font-size: 14px; }
+</style>
+</head>
+<body>
+<h1>تطبيق قواعد اللغة الإنجليزية</h1>
+<div class="container">
+  <div>
+    <button id="showSuggestion">الاقتراحات</button>
+    <div class="answer" id="suggestionsList">
+      <input type="text" id="suggestionInput" placeholder="اكتب اقتراحك هنا">
+      <button id="addSuggestion">إرسال</button>
+      <ul id="suggestionsDisplay"></ul>
+    </div>
+  </div>
+  <div>
+    <button id="showQuestions">الأسئلة المتاحة</button>
+    <div class="answer" id="questionsList">
+      <!-- الأسئلة ستظهر هنا لاحقاً -->
+    </div>
+  </div>
+  <div style="margin-top:20px;">
+    <h2>السؤال</h2>
+    <p id="currentQuestion">اختر سؤالاً من الأسئلة المتاحة أو تجربة سؤال.</p>
+    <button id="showAnswer">عرض الإجابة</button>
+    <div class="answer" id="answerDiv"></div>
+  </div>
+</div>
+<script>
+const questions = [
+  {q: "1. What is a noun?", a: "A noun is a word used to identify a person, place, thing, or idea. Example: 'cat', 'city', 'happiness'."},
+  {q: "2. What is a verb?", a: "A verb is a word that expresses an action or a state of being. Example: 'run', 'is'."},
+  {q: "3. What is an adjective?", a: "An adjective describes or modifies a noun. Example: 'happy', 'blue', 'tall'."},
+  {q: "4. What is an adverb?", a: "An adverb modifies a verb, adjective, or other adverb, often ending in -ly. Example: 'quickly', 'very'."},
+  {q: "5. What is a pronoun?", a: "A pronoun replaces a noun in a sentence. Example: 'he', 'they', 'it'."},
+  {q: "6. What are definite and indefinite articles?", a: "'The' is a definite article used for specific things; 'a' and 'an' are indefinite articles used for general things."},
+  {q: "7. What is the difference between 'a' and 'an'?", a: "Use 'a' before words starting with consonant sounds and 'an' before words starting with vowel sounds. Example: 'a dog', 'an apple'."},
+  {q: "8. What is the present simple tense?", a: "The present simple tense describes habits, general truths, or repeated actions. Example: 'I walk to school every day.'"},
+  {q: "9. What is the present continuous tense?", a: "The present continuous describes actions happening now. Form: 'am/is/are + verb-ing'. Example: 'I am reading a book.'"},
+  {q: "10. What is the past simple tense?", a: "The past simple expresses completed actions in the past. Example: 'She visited Paris last year.'"}
+  // هنا أكمل باقي الأسئلة لاحقًا في الأجزاء التالية
+];
+
+const suggestionsList = document.getElementById('suggestionsList');
+const showSuggestionBtn = document.getElementById('showSuggestion');
+const addSuggestionBtn = document.getElementById('addSuggestion');
+const suggestionsDisplay = document.getElementById('suggestionsDisplay');
+const suggestionInput = document.getElementById('suggestionInput');
+
+showSuggestionBtn.addEventListener('click', () => {
+  suggestionsList.style.display = suggestionsList.style.display === 'none' ? 'block' : 'none';
+});
+
+addSuggestionBtn.addEventListener('click', () => {
+  const val = suggestionInput.value.trim();
+  if(val){
+    const li = document.createElement('li');
+    li.textContent = val;
+    suggestionsDisplay.appendChild(li);
+    suggestionInput.value = '';
+  }
+});
+
+const questionsListDiv = document.getElementById('questionsList');
+const showQuestionsBtn = document.getElementById('showQuestions');
+const currentQuestion = document.getElementById('currentQuestion');
+const answerDiv = document.getElementById('answerDiv');
+const showAnswerBtn = document.getElementById('showAnswer');
+
+showQuestionsBtn.addEventListener('click', () => {
+  questionsListDiv.style.display = questionsListDiv.style.display === 'none' ? 'block' : 'none';
+  questionsListDiv.innerHTML = '';
+  questions.forEach((item, index) => {
+    const div = document.createElement('div');
+    div.className = 'question-item';
+    const span = document.createElement('span');
+    span.textContent = item.q;
+    const btn = document.createElement('button');
+    btn.textContent = 'تجربة';
+    btn.addEventListener('click', () => {
+      currentQuestion.textContent = item.q;
+      answerDiv.style.display = 'none';
+      answerDiv.textContent = '';
+      currentQuestion.dataset.index = index;
+    });
+    div.appendChild(span);
+    div.appendChild(btn);
+    questionsListDiv.appendChild(div);
+  });
+});
+
+showAnswerBtn.addEventListener('click', () => {
+  const index = currentQuestion.dataset.index;
+  if(index !== undefined){
+    answerDiv.textContent = questions[index].a;
+    answerDiv.style.display = 'block';
+  } else {
+    answerDiv.textContent = 'اختر سؤالاً أولاً من الأسئلة المتاحة.';
+    answerDiv.style.display = 'block';
+  }
+});
+</script>
+</body>
+</html>
+<!-- الجزء الثاني من تطبيق قواعد اللغة الإنجليزية (الأسئلة 11-50) -->
+<script>
+const questionsPart2 = [
+  {q: "11. What is a modal verb?", a: "A modal verb expresses ability, permission, possibility, or obligation. Example: 'can', 'may', 'must'."},
+  {q: "12. What is the difference between 'can' and 'may'?", a: "'Can' shows ability; 'may' shows permission. Example: 'I can swim.' / 'May I go out?'"},
+  {q: "13. What is the past continuous tense?", a: "Used for actions in progress at a past time. Form: 'was/were + verb-ing'. Example: 'I was reading at 5 PM.'"},
+  {q: "14. What is the present perfect tense?", a: "Used for actions that occurred at an unspecified time before now or that have relevance to now. Example: 'I have eaten.'"},
+  {q: "15. What is the past perfect tense?", a: "Used to show an action completed before another past action. Example: 'I had eaten before he arrived.'"},
+  {q: "16. What is the difference between 'since' and 'for'?", a: "'Since' refers to a starting point; 'for' refers to duration. Example: 'since 2000', 'for two years.'"},
+  {q: "17. What is a relative clause?", a: "A relative clause gives extra information about a noun. Example: 'The man who called is my uncle.'"},
+  {q: "18. What are relative pronouns?", a: "Relative pronouns introduce relative clauses. Example: who, which, that, whose."},
+  {q: "19. What is a gerund?", a: "A gerund is the -ing form used as a noun. Example: 'Swimming is fun.'"},
+  {q: "20. What is an infinitive?", a: "An infinitive is 'to + verb'. Example: 'I want to eat.'"},
+  {q: "21. What is a participle?", a: "A participle is a verb form used as adjective or in perfect tenses. Example: 'The broken window' / 'I have eaten.'"},
+  {q: "22. What is a compound sentence?", a: "A compound sentence has two independent clauses joined by a conjunction. Example: 'I went home and I ate dinner.'"},
+  {q: "23. What is a complex sentence?", a: "A complex sentence has an independent clause and one or more dependent clauses. Example: 'I stayed home because it was raining.'"},
+  {q: "24. What is a simple sentence?", a: "A simple sentence has one independent clause. Example: 'I like pizza.'"},
+  {q: "25. What is a phrasal verb?", a: "A phrasal verb is a verb + preposition/adverb. Example: 'give up', 'look after'."},
+  {q: "26. What is an auxiliary verb?", a: "An auxiliary verb helps the main verb to form tenses, questions, or negatives. Example: 'is', 'have', 'do'."},
+  {q: "27. What is the difference between 'will' and 'shall'?", a: "'Will' for future intentions, 'shall' more formal/offering suggestions. Example: 'I will go.' / 'Shall we dance?'"},
+  {q: "28. What are determiners?", a: "Determiners introduce nouns. Example: 'the', 'a', 'some', 'this'."},
+  {q: "29. What is the difference between 'each', 'every', and 'all'?", a: "'Each' refers to individual items; 'every' refers to all items collectively. Example: 'Each student has a book.' / 'Every student passed.'"},
+  {q: "30. What is the difference between 'somebody', 'someone', 'anybody', 'anyone'?", a: "'Somebody'/'someone' positive; 'anybody'/'anyone' negative/questions. Example: 'Someone is here.' / 'Is anyone here?'"},
+  {q: "31. What is the difference between 'much', 'many', 'a lot of'?", a: "'Much' with uncountable nouns; 'many' with countable nouns; 'a lot of' for both. Example: 'much water', 'many books', 'a lot of food.'"},
+  {q: "32. What are countable and uncountable nouns?", a: "Countable nouns can be counted; uncountable cannot. Example: 'book/books', 'water'."},
+  {q: "33. What is the difference between 'do' and 'make'?", a: "'Do' for actions, 'make' for creating. Example: 'do homework', 'make a cake'."},
+  {q: "34. What is the difference between 'say' and 'tell'?", a: "'Say' is to speak words; 'tell' is to inform. Example: 'He said hello.' / 'He told me a story.'"},
+  {q: "35. What is the difference between 'hear' and 'listen'?", a: "'Hear' is passive; 'listen' is active. Example: 'I hear a noise.' / 'I listen to music.'"},
+  {q: "36. What is the difference between 'look', 'see', and 'watch'?", a: "'Look' is to direct eyes, 'see' is passive perception, 'watch' is continuous observation. Example: 'Look at me.' / 'I see a bird.' / 'I watch TV.'"},
+  {q: "37. What is the difference between 'bring' and 'take'?", a: "'Bring' toward speaker, 'take' away from speaker. Example: 'Bring it here.' / 'Take it there.'"},
+  {q: "38. What is the difference between 'lend' and 'borrow'?", a: "'Lend' give temporarily, 'borrow' take temporarily. Example: 'Can you lend me a pen?' / 'Can I borrow a pen?'"},
+  {q: "39. What is the difference between 'rise' and 'raise'?", a: "'Rise' goes up by itself; 'raise' is caused by someone. Example: 'The sun rises.' / 'I raise my hand.'"},
+  {q: "40. What is the difference between 'lie' and 'lay'?", a: "'Lie' recline; 'lay' put down. Example: 'I lie down.' / 'I lay the book.'"},
+  {q: "41. What is the difference between 'lose' and 'miss'?", a: "'Lose' is to misplace; 'miss' fail to catch/attend. Example: 'I lost my keys.' / 'I missed the bus.'"},
+  {q: "42. What is the difference between 'say' and 'speak'?", a: "'Say' is words; 'speak' is language or talking. Example: 'I say hello.' / 'I speak English.'"},
+  {q: "43. What is the difference between 'few' and 'a few'?", a: "'Few' means not many, 'a few' means some. Example: 'Few people came.' / 'A few people came.'"},
+  {q: "44. What is the difference between 'little' and 'a little'?", a: "'Little' means almost none, 'a little' means some. Example: 'I have little money.' / 'I have a little money.'"},
+  {q: "45. What is the difference between 'ago' and 'before'?", a: "'Ago' refers to past from now; 'before' relative past. Example: 'Three years ago', 'I had left before he came.'"},
+  {q: "46. What is the difference between 'during' and 'while'?", a: "'During' means in the time of; 'while' means at the same time. Example: 'During the meeting, I took notes.' / 'I read while he cooked.'"},
+  {q: "47. What is the difference between 'because' and 'because of'?", a: "'Because' introduces a clause; 'because of' introduces a noun/phrase. Example: 'I stayed home because it rained.' / 'I stayed home because of rain.'"},
+  {q: "48. What is the difference between 'so' and 'therefore'?", a: "'So' indicates result; 'therefore' more formal. Example: 'It was raining, so I stayed home.' / 'It was raining; therefore, I stayed home.'"},
+  {q: "49. What is the difference between 'although' and 'though'?", a: "Both mean despite. Example: 'Although it rained, we went out.'"},
+  {q: "50. What is the difference between 'however' and 'nevertheless'?", a: "Contrast words. Example: 'It was raining. However, we went out.'"}
+];
+
+// دمج الجزء الثاني مع الجزء الأول
+questions.push(...questionsPart2);
+</script>
+<!-- الجزء الثالث من تطبيق قواعد اللغة الإنجليزية (الأسئلة 51-101) -->
+<script>
+const questionsPart3 = [
+  {q: "51. What is the difference between 'since' and 'for'?", a: "'Since' refers to a starting point; 'for' refers to duration. Example: 'since 2000', 'for two years.'"},
+  {q: "52. What is the difference between 'yet', 'already', and 'just'?", a: "'Yet' for negatives/questions, 'already' for completed actions, 'just' for very recent actions. Example: 'I haven't eaten yet.' / 'I have already eaten.' / 'I have just eaten.'"},
+  {q: "53. What is the difference between 'much' and 'many'?", a: "'Much' with uncountable nouns; 'many' with countable nouns. Example: 'much water', 'many books.'"},
+  {q: "54. What is the difference between 'few' and 'a few'?", a: "'Few' means not many, 'a few' means some. Example: 'Few people came.' / 'A few people came.'"},
+  {q: "55. What is the difference between 'little' and 'a little'?", a: "'Little' means almost none, 'a little' means some. Example: 'I have little money.' / 'I have a little money.'"},
+  {q: "56. What is a relative clause?", a: "A relative clause gives extra information about a noun. Example: 'The man who called is my uncle.'"},
+  {q: "57. What are relative pronouns?", a: "Relative pronouns introduce relative clauses. Example: who, which, that, whose."},
+  {q: "58. What is a gerund?", a: "A gerund is the -ing form used as a noun. Example: 'Swimming is fun.'"},
+  {q: "59. What is an infinitive?", a: "An infinitive is 'to + verb'. Example: 'I want to eat.'"},
+  {q: "60. What is a participle?", a: "A participle is a verb form used as adjective or in perfect tenses. Example: 'The broken window' / 'I have eaten.'"},
+  {q: "61. What is a compound sentence?", a: "A compound sentence has two independent clauses joined by a conjunction. Example: 'I went home and I ate dinner.'"},
+  {q: "62. What is a complex sentence?", a: "A complex sentence has an independent clause and one or more dependent clauses. Example: 'I stayed home because it was raining.'"},
+  {q: "63. What is a simple sentence?", a: "A simple sentence has one independent clause. Example: 'I like pizza.'"},
+  {q: "64. What is a phrasal verb?", a: "A phrasal verb is a verb + preposition/adverb. Example: 'give up', 'look after'."},
+  {q: "65. What is an auxiliary verb?", a: "An auxiliary verb helps the main verb to form tenses, questions, or negatives. Example: 'is', 'have', 'do'."},
+  {q: "66. What is the difference between 'will' and 'shall'?", a: "'Will' for future intentions, 'shall' more formal/offering suggestions. Example: 'I will go.' / 'Shall we dance?'"},
+  {q: "67. What are determiners?", a: "Determiners introduce nouns. Example: 'the', 'a', 'some', 'this'."},
+  {q: "68. What is the difference between 'each', 'every', and 'all'?", a: "'Each' individual; 'every' all collectively. Example: 'Each student has a book.' / 'Every student passed.'"},
+  {q: "69. What is the difference between 'somebody', 'someone', 'anybody', 'anyone'?", a: "'Somebody'/'someone' positive; 'anybody'/'anyone' negative/questions. Example: 'Someone is here.' / 'Is anyone here?'"},
+  {q: "70. What is the difference between 'much', 'many', 'a lot of'?", a: "'Much' uncountable; 'many' countable; 'a lot of' both. Example: 'much water', 'many books', 'a lot of food.'"},
+  {q: "71. What are countable and uncountable nouns?", a: "Countable nouns can be counted; uncountable cannot. Example: 'book/books', 'water'."},
+  {q: "72. What is the difference between 'do' and 'make'?", a: "'Do' for actions, 'make' for creating. Example: 'do homework', 'make a cake'."},
+  {q: "73. What is the difference between 'say' and 'tell'?", a: "'Say' words; 'tell' inform. Example: 'He said hello.' / 'He told me a story.'"},
+  {q: "74. What is the difference between 'hear' and 'listen'?", a: "'Hear' passive; 'listen' active. Example: 'I hear a noise.' / 'I listen to music.'"},
+  {q: "75. What is the difference between 'look', 'see', and 'watch'?", a: "'Look' direct eyes, 'see' passive, 'watch' continuous. Example: 'Look at me.' / 'I see a bird.' / 'I watch TV.'"},
+  {q: "76. What is the difference between 'bring' and 'take'?", a: "'Bring' toward speaker; 'take' away. Example: 'Bring it here.' / 'Take it there.'"},
+  {q: "77. What is the difference between 'lend' and 'borrow'?", a: "'Lend' give temporarily; 'borrow' take temporarily. Example: 'Can you lend me a pen?' / 'Can I borrow a pen?'"},
+  {q: "78. What is the difference between 'rise' and 'raise'?", a: "'Rise' goes up by itself; 'raise' is caused. Example: 'The sun rises.' / 'I raise my hand.'"},
+  {q: "79. What is the difference between 'lie' and 'lay'?", a: "'Lie' recline; 'lay' put down. Example: 'I lie down.' / 'I lay the book.'"},
+  {q: "80. What is the difference between 'lose' and 'miss'?", a: "'Lose' misplace; 'miss' fail to catch. Example: 'I lost my keys.' / 'I missed the bus.'"},
+  {q: "81. What is the difference between 'say' and 'speak'?", a: "'Say' words; 'speak' language/talk. Example: 'I say hello.' / 'I speak English.'"},
+  {q: "82. What is the difference between 'few' and 'a few'?", a: "'Few' not many; 'a few' some. Example: 'Few people came.' / 'A few people came.'"},
+  {q: "83. What is the difference between 'little' and 'a little'?", a: "'Little' almost none; 'a little' some. Example: 'I have little money.' / 'I have a little money.'"},
+  {q: "84. What is the difference between 'ago' and 'before'?", a: "'Ago' past from now; 'before' relative past. Example: 'Three years ago', 'I had left before he came.'"},
+  {q: "85. What is the difference between 'during' and 'while'?", a: "'During' in the time of; 'while' at same time. Example: 'During the meeting, I took notes.' / 'I read while he cooked.'"},
+  {q: "86. What is the difference between 'because' and 'because of'?", a: "'Because' clause; 'because of' noun/phrase. Example: 'I stayed home because it rained.' / 'I stayed home because of rain.'"},
+  {q: "87. What is the difference between 'so' and 'therefore'?", a: "'So' result; 'therefore' formal. Example: 'It was raining, so I stayed home.' / 'It was raining; therefore, I stayed home.'"},
+  {q: "88. What is the difference between 'although' and 'though'?", a: "Despite. Example: 'Although it rained, we went out.'"},
+  {q: "89. What is the difference between 'however' and 'nevertheless'?", a: "Contrast. Example: 'It was raining. However, we went out.'"},
+  {q: "90. What is the difference between 'while' and 'whereas'?", a: "Contrast. Example: 'I like tea, whereas he likes coffee.'"},
+  {q: "91. What is the difference between 'before' and 'until'?", a: "'Before' earlier; 'until' up to time. Example: 'I slept before 10.' / 'I waited until 10.'"},
+  {q: "92. What is the difference between 'on time' and 'in time'?", a: "'On time' punctual; 'in time' before deadline. Example: 'He arrived on time.' / 'I got there in time.'"},
+  {q: "93. What is the difference between 'at first' and 'in the beginning'?", a: "Beginning vs start of period/story. Example: 'At first, I was nervous.' / 'In the beginning, there was light.'"},
+  {q: "94. What is the difference between 'in spite of' and 'despite'?", a: "Despite. Example: 'In spite of the rain, we went out.' / 'Despite the rain, we went out.'"},
+  {q: "95. What is the difference between 'by' and 'until'?", a: "Deadline vs up to point. Example: 'Finish by 5 PM.' / 'Wait until 5 PM.'"},
+  {q: "96. What is the difference between 'between' and 'among'?", a: "'Between' two things; 'among' three or more. Example: 'Between you and me.' / 'Among the students.'"},
+  {q: "97. What is the difference between 'each' and 'every'?", a: "'Each' individual; 'every' collective. Example: 'Each student has a pen.' / 'Every student passed.'"},
+  {q: "98. What is the difference between 'few' and 'several'?", a: "'Few' small number; 'several' more than few. Example: 'Few people came.' / 'Several people came.'"},
+  {q: "99. What is the difference between 'since' and 'ago'?", a: "'Since' starting point; 'ago' past from now. Example: 'Since 2000', 'Three years ago.'"},
+  {q: "100. What is the difference between 'already' and 'yet'?", a: "'Already' completed; 'yet' not completed (questions/negatives). Example: 'I have already eaten.' / 'Have you eaten yet?'"},
+  {q: "101. What is the difference between 'just' and 'recently'?", a: "'Just' very recent; 'recently' in the near past. Example: 'I have just finished.' / 'I finished recently.'"}
+];
+
+questions.push(...questionsPart3);
+</script>
